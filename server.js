@@ -3,6 +3,7 @@ import morgan from 'morgan'
 import * as dotenv from 'dotenv'
 import jobRouter from './Routes/Route.js'
 import authRoute from './Routes/authRoute.js'
+import userRoute from './Routes/userRoute.js'
 import mongoose from 'mongoose'
 import errorHandlerMidleware from './ErrorHandlerMidleware/ErrorHandlerMilderware.js'
 import { authenticatedUser } from './ErrorHandlerMidleware/authMiddleware.js'
@@ -45,7 +46,7 @@ app.use(cookieParser())
 app.use(express.json())
 
 app.use('/api/v1/jobs', jobRouter)
-app.use('/api/v1/user', user)
+app.use('/api/v1/user', userRoute)
 
 // Stats endpoint requires the logged-in user so the chart can load their data
 app.get('/api/v1/jobs/state', authenticatedUser, showState)
