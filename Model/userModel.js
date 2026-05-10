@@ -1,0 +1,32 @@
+import { Admin } from "mongodb";
+import mongoose from "mongoose";
+
+
+const userModel = mongoose.Schema({
+  name: String,
+  email: String,
+  password: String,
+  lastName: {
+    type: String,
+    default: 'lastName',
+  },
+  location: {
+    type: String,
+    default: 'my city',
+  },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user',
+  },
+  avatar: String,
+  avatarId: String,
+})
+
+userModel.methods.toJSON = function () {
+  let obj = this.toObject();
+  delete obj.password;
+  return obj;
+}
+
+export default mongoose.model("User", userModel)
