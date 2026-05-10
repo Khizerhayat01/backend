@@ -59,40 +59,29 @@ app.use((req, res) => {
 
 app.use(errorHandlerMidleware)
 
-try {
+let isConnected = false
+
+async function connectDB() {
+  if (isConnected) return
+  try {
     await mongoose.connect(process.env.MONGODB_URL)
-    console.log('MongoDB connected')
-    console.log(process.env.MONGODB_URL)
-} catch (error) {
+    console.log("MongoDB connected")
+    isConnected = true
+  } catch (error) {
     console.error('MongoDB connection failed:', error)
-    process.exit(1)
+    throw error
+  }
 }
 
+app.use(async (req, res, next) => {
+  try {
+    await connectDB()
+    next()
+  } catch (error) {
+    res.status(500).json({ message: 'Database connection failed' })
+  }
+})
+
 export default app
-
-// let isConnected = false
-
-// async function connectDB() {
-//   try {
-//     await mongoose.connect(process.env.MONGODB_URL)
-//     console.log("MongoDB connected")
-//     isConnected = true
-//     const port = process.env.PORT || 3000
-//     app.listen(port, () => {
-//       console.log(`Server is running on port ${port}`)
-//     })
-//   }
-// }
-
-//add middleware
-
-// app.use((req,res,next) => {
-//   if(!isConnected) {
-//     connectDB()
-//   }
-//   next()
-// })
-
-// module.exports = app
 
 
