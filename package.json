@@ -13,10 +13,10 @@
   },
   "scripts": {
     "setup-project": "npm i && cd job poster && npm i",
-    "serve": "nodemon server.js",
+    "serve": "nodemon start.js",
     "client": "cd job poster && npm run dev",
     "dev": "concurrently --kill-others-on-fail \"npm run serve\" \"npm run client\"",
-    "node-build": "node server.js"
+    "node-build": "node start.js"
   },
   "dependencies": {
     "async": "^3.2.6",
