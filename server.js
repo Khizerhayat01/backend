@@ -1,3 +1,4 @@
+import 'express-async-errors'
 import express from 'express'
 import morgan from 'morgan'
 import * as dotenv from 'dotenv'
@@ -45,6 +46,26 @@ if (process.env.NODE_ENV === 'Development') {
 app.use(cookieParser())
 app.use(express.json())
 
+let isConnected = false
+
+const connectDB = async () => {
+    if (isConnected) return
+    const mongoUrl = process.env.MONGODB_URL
+    if (!mongoUrl) throw new Error('MONGODB_URL environment variable is not set')
+    await mongoose.connect(mongoUrl)
+    isConnected = true
+    console.log('MongoDB connected')
+}
+
+app.use(async (req, res, next) => {
+    try {
+        await connectDB()
+        next()
+    } catch (error) {
+        next(error)
+    }
+})
+
 app.use('/api/v1/jobs', jobRouter)
 app.use('/api/v1/user', userRoute)
 
@@ -59,29 +80,31 @@ app.use((req, res) => {
 
 app.use(errorHandlerMidleware)
 
-let isConnected = false
-
-async function connectDB() {
-  if (isConnected) return
-  try {
-    await mongoose.connect(process.env.MONGODB_URL)
-    console.log("MongoDB connected")
-    isConnected = true
-  } catch (error) {
-    console.error('MongoDB connection failed:', error)
-    throw error
-  }
-}
-
-app.use(async (req, res, next) => {
-  try {
-    await connectDB()
-    next()
-  } catch (error) {
-    res.status(500).json({ message: 'Database connection failed' })
-  }
-})
-
 export default app
+
+// let isConnected = false
+
+// async function connectDB() {
+//   try {
+//     await mongoose.connect(process.env.MONGODB_URL)
+//     console.log("MongoDB connected")
+//     isConnected = true
+//     const port = process.env.PORT || 3000
+//     app.listen(port, () => {
+//       console.log(`Server is running on port ${port}`)
+//     })
+//   }
+// }
+
+//add middleware
+
+// app.use((req,res,next) => {
+//   if(!isConnected) {
+//     connectDB()
+//   }
+//   next()
+// })
+
+// module.exports = app
 
 
